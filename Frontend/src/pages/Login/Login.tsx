@@ -2,10 +2,16 @@ import { Link } from 'react-router-dom'
 import background from '../../assets/BackGround3.png'
 import styles from './Login.module.css'
 import { useForm } from 'react-hook-form'
+import { useState } from 'react';
 
 export default function Login() {
 
   let { register, handleSubmit, formState: { errors } } = useForm();
+  const [showPass , setShowPass] = useState(false);
+
+  const handleshowPass = ()=>{
+    setShowPass(!showPass);
+  }
 
   const onSubmit = (data) => {
     console.log(data);
@@ -22,18 +28,21 @@ export default function Login() {
               <p className='text-xl'>Sign in to continue to HRM Portal</p>
             </div>
             <div>
+              {/* email part */}
               <div className='flex items-center gap-4 grow border border-white/50 bg-white/20 border rounded-md p-3 mb-2'>
                 <i className="fa-regular fa-user text-stone-600"></i>
                 <input className='grow focus:outline-none' type='email' placeholder='Email' {...register("email", { required: "The email is required", minLength: { value: 6, message: "Min length is 6" } })} />
               </div>
               {errors.email && <span className={`text-red-600`}>{errors.email.message}</span>}
             </div>
-
+              {/* password Part */}
             <div>
               <div className='flex items-center gap-4 grow border border-white/50 bg-white/20 rounded-md p-3 mb-2'>
                 <i className="fa-solid fa-lock text-stone-600"></i>
-                <input className='grow focus:outline-none' type="password" placeholder='Password' {...register("password", { required: "This feild is required", minLength: { value: 6, message: "Min length is 6" } })} />
-                <i className="fa-solid fa-eye-slash text-stone-600"></i>
+                <input className='grow focus:outline-none' type={showPass ? "text" : "password"} placeholder='Password' {...register("password", { required: "This feild is required", minLength: { value: 6, message: "Min length is 6" } })} />
+                <button className='cursor-pointer' onClick={handleshowPass}>
+                  {showPass ? <i className="fa-solid fa-eye"></i> : <i className="fa-solid fa-eye-slash text-stone-600"></i>}
+                  </button>
 
               </div>
               {errors.password && <span className='text-red-500 mb-6'>{errors.password.message}</span>}
