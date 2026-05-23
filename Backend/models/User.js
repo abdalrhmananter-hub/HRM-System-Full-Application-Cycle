@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         required:true,
         index:true
     },
-    passwordHash:{
+    password:{
         type:String,
         required: true,
         minlength: 6,
@@ -64,14 +64,14 @@ const userSchema = new mongoose.Schema({
 
 },{timestamps:true});
 
-userSchema.pre("save", async function(next){
-    if(!this.isModified("passwordHash")) return next();
-    this.passwordHash = await bcrypt.hash(this.passwordHash,10);
+userSchema.pre("save", async function(){
+    if(!this.isModified("password")) return;
+    this.password = await bcrypt.hash(this.password,10);
 })
 
 userSchema.methods.comparePassword = async function(matchedPassword){
     
-   return await  bcrypt.compare(matchedPassword,this.passwordHash);
+   return await  bcrypt.compare(matchedPassword,this.password);
 
    
 }

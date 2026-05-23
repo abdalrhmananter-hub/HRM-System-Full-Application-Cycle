@@ -3,29 +3,42 @@ require('dotenv').config();
 //express and app
 const express = require("express");
 const app = express();
+const userRouter = require('./routers/user.routes');
+const DB_connection = require('./configs/db');
+const port = process.env.PORT
+
+//DB
+DB_connection();
+
+
 //JSON middleware
 app.use(express.json());
-//DB
-const DB_connection = require('./configs/db');
-
-DB_connection();
 //simple logger
 app.use((req,res,next)=>{
     try {
         console.log(req.method, req.originalUrl);
+        next()
     } catch (error) {
         console.log(error)
+        next(error)
     }
 })
-//PORT
-const port = process.env.port
+
+
+
+
+app.use('/users',userRouter);
+
+
 
 //Global middleWare Handler:
 app.use((err,req,res,next)=>{
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "Server error"
 
+    console.error("ERROR Stack:", err.stack);
     res.status(err.statusCode).json({
+        err:err,
         status:err.status,
         message:err.message,
     });
