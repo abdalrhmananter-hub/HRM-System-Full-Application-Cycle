@@ -1,21 +1,25 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import background from '../../assets/BackGround3.png'
 import styles from './Login.module.css'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function Login() {
 
   let { register, handleSubmit, formState: { errors } } = useForm();
   const [showPass , setShowPass] = useState(false);
+  const navigate = useNavigate()
 
   const handleshowPass = ()=>{
     setShowPass(!showPass);
   }
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-    alert("Data was sent.....")
+    const res = await axios.post('http://localhost:5000/users/login', data)
+    console.log(res)
+    navigate("http://localhost:5000/users")
   }
   return (
     <div className={`${styles.bgColor} grid grid-cols-2 h-screen bg-no-repeat bg-cover bg-center `} style={{ backgroundImage: `url(${background})` }}>
@@ -40,7 +44,7 @@ export default function Login() {
               <div className='flex items-center gap-4 grow border border-white/50 bg-white/20 rounded-md p-3 mb-2'>
                 <i className="fa-solid fa-lock text-stone-600"></i>
                 <input className='grow focus:outline-none' type={showPass ? "text" : "password"} placeholder='Password' {...register("password", { required: "This feild is required", minLength: { value: 6, message: "Min length is 6" } })} />
-                <button className='cursor-pointer' onClick={handleshowPass}>
+                <button type='button' className='cursor-pointer' onClick={handleshowPass}>
                   {showPass ? <i className="fa-solid fa-eye"></i> : <i className="fa-solid fa-eye-slash text-stone-600"></i>}
                   </button>
 
