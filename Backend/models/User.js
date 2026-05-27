@@ -1,3 +1,7 @@
+const dns = require("node:dns");
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 const { required, string } = require('joi');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')

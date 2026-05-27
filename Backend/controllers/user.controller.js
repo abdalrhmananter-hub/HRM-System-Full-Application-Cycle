@@ -24,11 +24,21 @@ exports.register = async (req, res, next) => {
         }
         //The password already hashed in modle
         //save the user
+        delete req.body.confirmPassword;
         const newUser = new User(req.body);
-        await newUser.save();
+        
         //create a token: will add it after finishing the controller.
         const token = generateToken(newUser.id, newUser.role);
+        const refreshToken = generateRefreshToken(newUser.id);
+        newUser.refreshToken = refreshToken;
+        await newUser.save();
         //return a response
+        res.cookie('refreshToken',refreshToken,{
+            httpOnly:true, //protect aganist xss
+            secure: process.env.NODE_ENV === 'production',
+            sameSite:'strict', //protect aganist CSRF
+            maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
+        });
         return res.status(201).json({ Message: "User Is Created Successfully ", token });
 
     } catch (error) {
@@ -43,7 +53,7 @@ exports.login = async (req, res, next) => {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
             const err = new Error('Wrong Email or Password');
-            err.status = 'fail',
+            err.status = 'fail';
                 err.statusCode = 400;
             return next(err);
         }
@@ -61,7 +71,13 @@ exports.login = async (req, res, next) => {
         user.refreshToken = refreshToken;
         await user.save();
         //return response
-        return res.status(200).json({ Message: "Logged in successfully", token , refreshToken })
+        res.cookie('refreshToken',refreshToken,{
+            httpOnly:true, //protect aganist xss
+            secure: process.env.NODE_ENV === 'production',
+            sameSite:'strict', //protect aganist CSRF
+            maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
+        });
+        return res.status(200).json({ Message: "Logged in successfully", token})
     } catch (error) {
         next(error);
     }
@@ -70,7 +86,7 @@ exports.login = async (req, res, next) => {
 //handle refershToken:
 exports.handleRefreshToken = async (req, res, next) => {
     try {
-        const { refreshToken } = req.body;
+        const { refreshToken } = req.cookies;
         if (!refreshToken) {
             const err = new Error('Refresh Token is required');
             err.status = 'fail'
@@ -99,4 +115,9 @@ exports.handleRefreshToken = async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+}
+
+exports.logout = (req,res,next)=>{
+    res.clearCookie('refreshToken');
+    return res.status(200).json({Message:"Loggedout Successfully"});
 }
