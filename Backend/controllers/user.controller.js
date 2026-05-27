@@ -15,6 +15,10 @@ exports.getAllusers = async (req, res, next) => {
 exports.register = async (req, res, next) => {
     try {
         //check if the user exists
+        let profileImageUrl = null;
+        if (req.file) {
+            profileImageUrl = req.file.path;
+        }
         const user = await User.findOne({ email: req.body.email });
         if (user) {
             const err = new Error("Email already exist please try another email");
@@ -25,18 +29,19 @@ exports.register = async (req, res, next) => {
         //The password already hashed in modle
         //save the user
         delete req.body.confirmPassword;
+        if (profileImageUrl) req.body.profilePicture = profileImageUrl;
         const newUser = new User(req.body);
-        
+
         //create a token: will add it after finishing the controller.
         const token = generateToken(newUser.id, newUser.role);
         const refreshToken = generateRefreshToken(newUser.id);
         newUser.refreshToken = refreshToken;
         await newUser.save();
         //return a response
-        res.cookie('refreshToken',refreshToken,{
-            httpOnly:true, //protect aganist xss
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true, //protect aganist xss
             secure: process.env.NODE_ENV === 'production',
-            sameSite:'strict', //protect aganist CSRF
+            sameSite: 'strict', //protect aganist CSRF
             maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
         });
         return res.status(201).json({ Message: "User Is Created Successfully ", token });
@@ -54,7 +59,7 @@ exports.login = async (req, res, next) => {
         if (!user) {
             const err = new Error('Wrong Email or Password');
             err.status = 'fail';
-                err.statusCode = 400;
+            err.statusCode = 400;
             return next(err);
         }
         //check the password
@@ -71,13 +76,13 @@ exports.login = async (req, res, next) => {
         user.refreshToken = refreshToken;
         await user.save();
         //return response
-        res.cookie('refreshToken',refreshToken,{
-            httpOnly:true, //protect aganist xss
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true, //protect aganist xss
             secure: process.env.NODE_ENV === 'production',
-            sameSite:'strict', //protect aganist CSRF
+            sameSite: 'strict', //protect aganist CSRF
             maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
         });
-        return res.status(200).json({ Message: "Logged in successfully", token})
+        return res.status(200).json({ Message: "Logged in successfully", token })
     } catch (error) {
         next(error);
     }
@@ -117,7 +122,23 @@ exports.handleRefreshToken = async (req, res, next) => {
     }
 }
 
-exports.logout = (req,res,next)=>{
-    res.clearCookie('refreshToken');
-    return res.status(200).json({Message:"Loggedout Successfully"});
+exports.logout = async (req, res, next) => {
+    try {
+        const {refreshToken} = req.cookies;
+        if(refreshToken)
+        {
+            await User.findOneAndUpdate({refreshToken: refreshToken},
+                {$set:{refreshToken:null}},
+            )
+        }
+        res.clearCookie('refreshToken',
+            {httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',}
+        );
+       
+        return res.status(200).json({ Message: "Loggedout Successfully" });
+    } catch (error) {
+        next(error)
+    }
 }

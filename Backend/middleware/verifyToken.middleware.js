@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {generateToken} = require('../utils/generateToken')
+
 
 exports.verifyToken = async (req, res, next) => {
     try {

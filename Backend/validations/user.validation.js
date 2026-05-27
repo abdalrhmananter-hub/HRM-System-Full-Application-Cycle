@@ -14,6 +14,7 @@ exports.regitserValidation = joi.object({
     annualLeaveBal:joi.number(),
     hireDate:joi.date().required(),
     isActive:joi.boolean(),
+    profilePicture:joi.string(),
 });
 
 exports.loginValidation = joi.object({

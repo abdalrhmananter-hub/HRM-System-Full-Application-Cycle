@@ -64,6 +64,9 @@ const userSchema = new mongoose.Schema({
     },
     refreshToken:{
         type:String,
+    },
+    profilePicture:{
+        type:String,
     }
 
 },{timestamps:true});
