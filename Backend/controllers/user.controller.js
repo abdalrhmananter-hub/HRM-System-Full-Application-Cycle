@@ -3,7 +3,7 @@ const { generateToken, generateRefreshToken } = require('../utils/generateToken'
 const jwt = require('jsonwebtoken')
 
 
-exports.getAllusers = async (req, res, next) => {
+exports.getAllemployees = async (req, res, next) => {
     try {
         const allUsers = await User.find();
         res.status(200).json({ Message: "All Users: ", allUsers });
@@ -138,6 +138,95 @@ exports.logout = async (req, res, next) => {
         );
        
         return res.status(200).json({ Message: "Loggedout Successfully" });
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.getEmpById = async (req,res,next)=>{
+    try {
+        const empId  = req.params.id
+        const emp  = await User.findById(empId);
+        if(!emp)
+        {
+            const err = new Error('Employee is not found');
+            err.status='fail';
+            err.statusCode = 404;
+            return next(err);
+        }
+        return res.status(200).json({Message:"Employee: ",emp});
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.updateEmpById = async(req,res,next)=>{
+    try {
+        const empId = req.params.id;
+        let imageUrl = null;
+        if(req.file)
+        {
+            imageUrl = req.file.path;
+            req.body.profilePicture = imageUrl;
+        }
+        
+        const updatedEmp = await User.findByIdAndUpdate(empId, req.body,
+            {new:true,runValidators:true}
+        );
+        if(!updatedEmp)
+        {
+            const err = new Error('Employee is not found');
+            err.status= 'fail';
+            err.statusCode = '404';
+            return next(err);
+        }
+        return res.status(200).json({Message:"Employee is updated successfuly:" , updatedEmp})
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.PartiallyUpdateEmpById = async(req,res,next)=>{
+    try {
+        const empId = req.params.id;
+        let imageUrl = null;
+        if(req.file)
+        {
+            imageUrl = req.file.path;
+            req.body.profilePicture = imageUrl;
+        }
+        
+        const updatedEmp = await User.findByIdAndUpdate(empId,
+            {$set:req.body},
+            {new:true , runValidators:true} 
+        )
+        if(!updatedEmp)
+        {
+            const err = new Error("Employee is not found");
+            err.status = 'fail';
+            err.statusCode = 404
+            return next(err);
+        }
+
+        return res.status(200).json({Message:"Employee is updated successfully: ", updatedEmp});
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.deleteEmployeeById = async(req,res,next)=>{
+    try {
+        const empId = req.params.id;
+        const deletedEmp = await User.findByIdAndDelete(empId);
+        if(!deletedEmp)
+        {
+            const err = new Error('Employee is not found');
+            err.status= 'fail';
+            err.statusCode = 404
+            return next(err);
+        }
+
+        return res.status(200).json({Message:"The employee was deleted successfully"});
     } catch (error) {
         next(error)
     }
