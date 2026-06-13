@@ -2,7 +2,7 @@
 exports.validate = (schema)=>{
     return (req,res,next)=>{
 
-        const {error} = schema.validate(req.body,{abortEarly:false});
+        const {error,value} = schema.validate(req.body,{abortEarly:false , stripUnknown: true});
     
         if(error)
         {
@@ -12,6 +12,7 @@ exports.validate = (schema)=>{
             err.statusCode = 400;
             return next(err);
         }
+        req.body = value;
         next();
     }
 }

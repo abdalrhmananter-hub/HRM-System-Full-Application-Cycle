@@ -8,10 +8,12 @@ const DB_connection = require('./configs/db');
 const port = process.env.PORT;
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const attendanceRouter = require('./routers/attendance.routes');
 
 //DB
 DB_connection();
 
+require('./utils/cron');
 
 //JSON middleware
 app.use(cors({
@@ -35,6 +37,8 @@ app.use((req,res,next)=>{
 
 
 app.use('/employees',userRouter);
+app.use('/attendance',attendanceRouter);
+
 
 
 

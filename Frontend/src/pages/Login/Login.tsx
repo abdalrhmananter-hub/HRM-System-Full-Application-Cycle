@@ -17,7 +17,7 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     console.log(data);
-    const res = await axios.post('http://localhost:5000/users/login', data)
+    const res = await axios.post('http://localhost:5000/employees/login', data)
     console.log(res)
     navigate("http://localhost:5000/users")
   }

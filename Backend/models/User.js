@@ -1,6 +1,4 @@
-const dns = require("node:dns");
 
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const { required, string } = require('joi');
 const mongoose = require('mongoose');
@@ -28,6 +26,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required: true,
         minlength: 6,
+        select:false,
     },
     phone:{
         type:String,
@@ -67,6 +66,10 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture:{
         type:String,
+    },
+    pendingBonus:{
+        type:Number,
+        default: 0,
     }
 
 },{timestamps:true});

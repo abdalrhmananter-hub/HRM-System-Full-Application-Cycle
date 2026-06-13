@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { generateToken, generateRefreshToken } = require('../utils/generateToken');
 const jwt = require('jsonwebtoken')
 
+//aske Dr.Ezz about  Object.assign(updatedEmp, req.body); and the put and patch thing 
 
 exports.getAllemployees = async (req, res, next) => {
     try {
@@ -55,7 +56,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         //check if the user exists
-        const user = await User.findOne({ email: req.body.email });
+        const user = await User.findOne({ email: req.body.email }).select("+password")
         if (!user) {
             const err = new Error('Wrong Email or Password');
             err.status = 'fail';
@@ -170,16 +171,18 @@ exports.updateEmpById = async(req,res,next)=>{
             req.body.profilePicture = imageUrl;
         }
         
-        const updatedEmp = await User.findByIdAndUpdate(empId, req.body,
-            {new:true,runValidators:true}
-        );
+        const updatedEmp = await User.findById(empId);
+
         if(!updatedEmp)
         {
             const err = new Error('Employee is not found');
             err.status= 'fail';
-            err.statusCode = '404';
+            err.statusCode = 404;
             return next(err);
         }
+
+        Object.assign(updatedEmp, req.body);
+        await updatedEmp.save();
         return res.status(200).json({Message:"Employee is updated successfuly:" , updatedEmp})
     } catch (error) {
         next(error);
@@ -196,10 +199,7 @@ exports.PartiallyUpdateEmpById = async(req,res,next)=>{
             req.body.profilePicture = imageUrl;
         }
         
-        const updatedEmp = await User.findByIdAndUpdate(empId,
-            {$set:req.body},
-            {new:true , runValidators:true} 
-        )
+        const updatedEmp = await User.findById(empId);
         if(!updatedEmp)
         {
             const err = new Error("Employee is not found");
@@ -207,7 +207,8 @@ exports.PartiallyUpdateEmpById = async(req,res,next)=>{
             err.statusCode = 404
             return next(err);
         }
-
+        Object.assign(updatedEmp, req.body);
+        await updatedEmp.save();
         return res.status(200).json({Message:"Employee is updated successfully: ", updatedEmp});
     } catch (error) {
         next(error);

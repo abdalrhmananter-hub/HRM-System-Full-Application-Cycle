@@ -1,3 +1,4 @@
-1-Study and Apply refresh Token 
-2- understand HttpOnly cookies then apply both
-3- complete the phase....
+1-Seed file
+2- check the remaining function in payroll control
+3- socite io
+4- find a eaiser way to handle error functions

@@ -1,23 +1,86 @@
 const Attendance = require('../models/Attendance');
-const emp = require('../models/User');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-exports.createAttendaceSheet = async(req,res,next)=>{ //I will make it like a button called open attances sheet 
-    try { // in the employee dashboard which can be click only once when the employee interact for the first time with the dashboard then it will be disappread, when the employee click on it it will create the attance model in the database, what do think ?
-        //we will make the frontend send date and the time and the id we will get it from user.info which is created by the middleware verifytoken, can the frontend send the date and time ? 
-        const empId = req.userInfo.id;
-        req.body.employee = empId;
-         const attendanceSheet = new Attendance(req.body) ;
-         await attendanceSheet.save();
-         return res.status(201).json({Message:"The attendace Sheet was created successfully"});
+const cairoTz = 'Africa/Cairo';
+
+//This is the another business logic for the attendace
+
+exports.checkIn = async(req,res,next)=>{
+    try {
+        const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
+        const timeNow = dayjs().tz(cairoTz);
+        const startOfShift = dayjs().tz(cairoTz).hour(9).minute(0).second(0).millisecond(0);
+        let delayInMinutes = 0 ;
+        if(timeNow.isAfter(startOfShift))
+        {
+            delayInMinutes = timeNow.diff(startOfShift,'minute');
+        }
+        //which logic is better? this => 
+        const attendanceSheet = await Attendance.findOne({employee:req.userInfo.id , date:todayDate});
+        if(!attendanceSheet)
+        {
+            const err = new Error('Something went wrong Please contact the HR');
+            err.statusCode = 500;
+            return next(err);
+        }
+        if(attendanceSheet.checkIn != null)
+        {
+            const err = new Error('You are already checked in Thank you!');
+            err.statusCode = 400;
+            return next(err);
+        }
+        attendanceSheet.checkIn = timeNow.toDate();
+        attendanceSheet.lateMinutes = delayInMinutes;
+        attendanceSheet.status = "present";
+        await attendanceSheet.save();
+        /*
+        or this =>
+        const checkIn = await Attendance.findOneAndUpdate({employee:req.userInfo.id,date:todayDate},
+            {$set:{checkIn:timeNow.toDate(),lateMinutes:delayInMinutes}}
+        );
+        */
+        res.status(200).json({Message:"Check in successfully"})
     } catch (error) {
         next(error)
     }
 }
-exports.checkIn = async(req,res,next)=>{//
+
+
+exports.checkOut = async(req,res,next)=>{
     try {
+        const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
+        const timeNow = dayjs().tz(cairoTz);
+
+        const attendanceSheet = await Attendance.findOne({employee:req.userInfo.id,date:todayDate});
+        if(!attendanceSheet)
+        {
+            const err = new Error("something went wrong please check the HR");
+            err.statusCode= 500;
+            return next(err);
+        }
+
+        if (attendanceSheet.checkIn === null) {
+            const err = new Error("You cannot check out without checking in first!");
+            err.statusCode = 400;
+            return next(err);
+        }
         
+        if(attendanceSheet.checkOut != null)
+        {
+            const err = new Error("You have already checked Out thank you");
+            err.statusCode = 400;
+            return next(err);
+        }
+        attendanceSheet.checkOut = timeNow.toDate();
+        await attendanceSheet.save()
+
+        res.status(200).json({Message:"check out successfully"});
     } catch (error) {
-        
+        next(error);
     }
 }
