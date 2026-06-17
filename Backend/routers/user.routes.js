@@ -19,6 +19,8 @@ router.post('/register',upload.single('profilePicture'),validate(regitserValidat
 router.get('/:id',getEmpById);
 router.delete('/:id',deleteEmployeeById);
 router.put('/:id',upload.single('profilePicture'),validate(updateValidation),updateEmpById);
-router.patch('/:id',upload.single('profilePicture'),validate(updateValidation),PartiallyUpdateEmpById);
+router.patch('/:id',upload.single('profilePicture'),validate(updateValidation),PartiallyUpdateEmpById); //?????
 
 module.exports = router;
+
+

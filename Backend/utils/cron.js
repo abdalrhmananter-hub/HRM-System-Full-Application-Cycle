@@ -50,9 +50,9 @@ const createPayRollForAllEmployees = new CronJob(
     `0 0 23 * * *`,
     async function () {
         try {
-            const now = dayjs.tz(cairoTZ);
-            const isLastDay = now.date() === now.endOf('month').date();
-            if (!isLastDay) return;
+            const now = dayjs().tz(cairoTZ);
+            //const isLastDay = now.date() === now.endOf('month').date();
+            //if (!isLastDay) return;
 
             const year = now.year();
             const month = now.month() + 1;
@@ -139,3 +139,6 @@ const createPayRollForAllEmployees = new CronJob(
     true,
     cairoTZ
 )
+
+//createAttendanceSheets.fireOnTick();
+//createPayRollForAllEmployees.fireOnTick();

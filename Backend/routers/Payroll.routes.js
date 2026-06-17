@@ -12,6 +12,6 @@ router.use(verifyToken,checkRole);
 
 router.get('/allpayroll/:month/:year', getAllPayrollByMonthAndYear);
 router.get('/getPayroll/:empId/:month/:year',getAllPayrollByEmpIDAndMonthAndYear); //how to send the year and month ??
-router.post('/createPayrollPreview',createMonthlyPayrollByIdUntillSpceificTime);
+//router.post('/createPayrollPreview',createMonthlyPayrollByIdUntillSpceificTime); working on it.
 
 module.exports = router;

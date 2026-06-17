@@ -9,7 +9,8 @@ const port = process.env.PORT;
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const attendanceRouter = require('./routers/attendance.routes');
-
+const leaveRequestsRouter = require('./routers/leaveRequest.routes');
+const payrollRouter = require('./routers/Payroll.routes');
 //DB
 DB_connection();
 
@@ -38,6 +39,8 @@ app.use((req,res,next)=>{
 
 app.use('/employees',userRouter);
 app.use('/attendance',attendanceRouter);
+app.use('/leaverequest',leaveRequestsRouter);
+app.use('/payroll',payrollRouter);
 
 
 

@@ -1,7 +1,7 @@
 const joi = require('joi');
 
 exports.leaveRequestValidation= joi.object({
-    employee:joi.string().required(),
+    employee:joi.string(),
     leaveType:joi.string().valid("Annual","Sick","Emergency","Unpaid"),
     startDate:joi.date().greater('now').required(),
     endDate:joi.date().greater(joi.ref('startDate')).required(),
