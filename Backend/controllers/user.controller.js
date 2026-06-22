@@ -13,6 +13,20 @@ exports.getAllemployees = async (req, res, next) => {
     }
 }
 
+exports.searchEmpsByname = async(req,res,next)=>{ //checkit
+    try {
+        const empName = req.params.name
+        const users = await User.find({
+            fullName: { $regex: empName, $options: 'i' },
+            _id: { $ne: req.userInfo.id } 
+        }).select('fullName role profileImage email');
+
+        return res.status(200).json({Message:"User is found" , users});
+    } catch (error) {
+        next(error);
+    }
+}
+
 exports.register = async (req, res, next) => {
     try {
         //check if the user exists

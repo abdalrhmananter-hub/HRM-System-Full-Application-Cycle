@@ -3,18 +3,29 @@ require('dotenv').config();
 //express and app
 const express = require("express");
 const app = express();
-const userRouter = require('./routers/user.routes');
 const DB_connection = require('./configs/db');
 const port = process.env.PORT;
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+
+
+//socket.io
+const http  = require("http");
+const {Server} = require("socket.io");
+const server = http.createServer(app);
+
+//Routers 
+const userRouter = require('./routers/user.routes');
 const attendanceRouter = require('./routers/attendance.routes');
 const leaveRequestsRouter = require('./routers/leaveRequest.routes');
 const payrollRouter = require('./routers/Payroll.routes');
+const conversationRouter = require('./routers/converstaions.routes');
+const messageRouter = require('./routers/message.routes');
 //DB
 DB_connection();
 
 require('./utils/cron');
+
 
 //JSON middleware
 app.use(cors({
@@ -41,6 +52,8 @@ app.use('/employees',userRouter);
 app.use('/attendance',attendanceRouter);
 app.use('/leaverequest',leaveRequestsRouter);
 app.use('/payroll',payrollRouter);
+app.use('./conversation',conversationRouter);
+app.use('/messages',messageRouter);
 
 
 
@@ -57,7 +70,16 @@ app.use((err,req,res,next)=>{
         message:err.message,
     });
 });
+//instiating the socket.io server.
+                //the server of socket.io
+const io = new Server(server,{
+    cors:{
+        origin: "*",
+        methods:["GET","POST"],
+    },
+});
+require("./sockets/chat.socket")(io);
 //AppListen
-app.listen(port,()=>{
+server.listen(port,()=>{
     console.log(`Server Is Running On ${port} `)
 })

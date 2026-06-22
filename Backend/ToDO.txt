@@ -2,3 +2,11 @@
 2- check the remaining function in payroll control
 3- socite io
 4- find a eaiser way to handle error functions
+5- Apply all the secuirty vurnnelbeilities
+6- refining the app structure and understand why.
+
+
+************************************
+Questions:
+
+when to use the method which make the database make the full operation which is calculating or whatever.
