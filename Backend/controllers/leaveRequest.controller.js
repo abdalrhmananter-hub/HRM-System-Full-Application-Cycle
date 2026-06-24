@@ -3,7 +3,8 @@ const User = require("../models/User");
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const cairoTz = 'Africa/Cairo'
+const cairoTz = 'Africa/Cairo';
+const {sendNotification} = require('../utils/notification.service');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -108,6 +109,22 @@ exports.apporveLeaveRequest = async (req, res, next) => {
         leaveRequest.reviewedAt = dayjs().tz(cairoTz).toDate();
         await leaveRequest.save();
         await emp.save();
+        await sendNotification(
+            req.app,
+            leaveRequest.employee,
+            'leave_approved',
+            `The leave request was approved, which was submitted on ${leaveRequest.startDate.toLocaleDateString()}`
+        )
+        if(emp.annualLeaveBal<=3)
+        {
+            await sendNotification(
+                req.app,
+                leaveRequest.employee,
+                'Low balance',
+                `You annual balance is ${emp.annualLeaveBal}`
+
+            )
+        }
         res.status(200).json({Message:"Ther request was approved."});
     } catch (error) {
         return next(error);
@@ -134,6 +151,12 @@ exports.rejectLeaveRequest = async(req,res,next)=>{
         leaveRequest.reviewedAt = dayjs().tz(cairoTz).toDate();
 
         await leaveRequest.save();
+        await sendNotification(
+            req.app,
+            leaveRequest.employee,
+            'leave_rejected',
+            `The leave request was rejected, which was submitted on ${leaveRequest.startDate.toLocaleDateString()}`
+        )
         return res.status(200).json({Message:"The request has been rejected."});
     } catch (error) {
         next(error)

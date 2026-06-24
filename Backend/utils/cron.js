@@ -6,11 +6,15 @@ const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 const Payroll = require('../models/Payroll');
 const LeaveRequest = require('../models/LeaveRequest');
+const {sendNotification} = require('../utils/notification.service')
 
 dayjs.extend(utc);
 dayjs.extend(timezone)
 
 const cairoTZ = 'Africa/Cairo';
+
+module.exports = (app)=>{
+
 
 const createAttendanceSheets = new CronJob(
     '0 0 7 * * 0-4', //how to skip friday and saturday?
@@ -51,8 +55,8 @@ const createPayRollForAllEmployees = new CronJob(
     async function () {
         try {
             const now = dayjs().tz(cairoTZ);
-            //const isLastDay = now.date() === now.endOf('month').date();
-            //if (!isLastDay) return;
+            const isLastDay = now.date() === now.endOf('month').date();
+            if (!isLastDay) return;
 
             const year = now.year();
             const month = now.month() + 1;
@@ -123,6 +127,12 @@ const createPayRollForAllEmployees = new CronJob(
                 });
 
                 payRollRecords.push(payroll);
+                await sendNotification(
+                app,
+                emp._id,
+                'payroll',
+                "Pay roll of the month"
+               )
             }
 
             if (payRollRecords.length > 0) {
@@ -130,6 +140,8 @@ const createPayRollForAllEmployees = new CronJob(
                 await User.updateMany({ isActive: true }, { $set: { pendingBonus: 0 } });
             }
 
+         
+               
             console.log("Payroll computed and stored successfully for all active employees.");
         } catch (error) {
             console.log(error);
@@ -139,6 +151,6 @@ const createPayRollForAllEmployees = new CronJob(
     true,
     cairoTZ
 )
-
+}
 //createAttendanceSheets.fireOnTick();
 //createPayRollForAllEmployees.fireOnTick();

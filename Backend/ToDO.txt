@@ -1,11 +1,11 @@
 1-Seed file
 2- check the remaining function in payroll control
-3- socite io
+3- socite io >>>>Done
 4- find a eaiser way to handle error functions
-5- Apply all the secuirty vurnnelbeilities
+5- Apply all the secuirty vurnerability
 6- refining the app structure and understand why.
-
-
+done IMP 7->>>>>>>What is the diference between using chat.socket.js and the helper function and how did we compineded them
+8-
 ************************************
 Questions:
 

@@ -21,10 +21,11 @@ const leaveRequestsRouter = require('./routers/leaveRequest.routes');
 const payrollRouter = require('./routers/Payroll.routes');
 const conversationRouter = require('./routers/converstaions.routes');
 const messageRouter = require('./routers/message.routes');
+const notificationsRouter = require('./routers/notification.routes');
 //DB
 DB_connection();
 
-require('./utils/cron');
+
 
 
 //JSON middleware
@@ -54,7 +55,7 @@ app.use('/leaverequest',leaveRequestsRouter);
 app.use('/payroll',payrollRouter);
 app.use('./conversation',conversationRouter);
 app.use('/messages',messageRouter);
-
+app.use('/notifications', notificationsRouter);
 
 
 
@@ -78,8 +79,11 @@ const io = new Server(server,{
         methods:["GET","POST"],
     },
 });
+app.set('io',io);
 require("./sockets/chat.socket")(io);
+require('./utils/cron')(app);
 //AppListen
-server.listen(port,()=>{
+server.listen(port,()=>{ //create server
     console.log(`Server Is Running On ${port} `)
 })
+
