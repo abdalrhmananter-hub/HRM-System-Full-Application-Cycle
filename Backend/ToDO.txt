@@ -5,7 +5,7 @@
 5- Apply all the secuirty vurnerability
 6- refining the app structure and understand why.
 done IMP 7->>>>>>>What is the diference between using chat.socket.js and the helper function and how did we compineded them
-8-
+8- handle this issue rejectLeaveRequest approveLeaveRequest
 ************************************
 Questions:
 
