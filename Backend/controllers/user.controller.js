@@ -86,7 +86,7 @@ exports.login = async (req, res, next) => {
             return next(err);
         }
         //generate token: will add it after finishing the controller
-        const token = generateToken(user.id, user.role);
+        const token = generateToken(user.id, user.role, user.fullName);
         const refreshToken = generateRefreshToken(user.id);
         user.refreshToken = refreshToken;
         await user.save();

@@ -4,12 +4,21 @@ import styles from './Login.module.css'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import {userInfo} from '../../redux/userSlice';
+
+
+
 
 export default function Login() {
 
   let { register, handleSubmit, formState: { errors } } = useForm();
   const [showPass , setShowPass] = useState(false);
   const navigate = useNavigate()
+
+  const count = useSelector((state: RootState) => state.counter.value)
+  const dispatch = useDispatch()
 
   const handleshowPass = ()=>{
     setShowPass(!showPass);
@@ -18,7 +27,16 @@ export default function Login() {
   const onSubmit = async (data) => {
     console.log(data);
     const res = await axios.post('http://localhost:5000/employees/login', data)
-    console.log(res)
+    const token = res.data.token;
+    console.log(token)
+    interface tokenPayload{
+      id:string;
+      name:"string";
+      role:"string";
+      exp:number
+    }
+    const decode = jwtDecode<tokenPayload>(token);
+    dispatch(userInfo(decode));
     navigate("http://localhost:5000/users")
   }
   return (
