@@ -9,7 +9,7 @@ export default function Navbar() {
   ]
   return (
     <>
-      <div className='px-5 py-3 flex justify-between w-full border-b border-stone-300'>
+      <div className='px-5 py-3 flex justify-between  w-full border-b border-stone-300'>
         <div>
           <form action="">
             <div className=' border border-stone-400 rounded-lg bg-white p-2 flex items-center gap-1 w-[300px]'>

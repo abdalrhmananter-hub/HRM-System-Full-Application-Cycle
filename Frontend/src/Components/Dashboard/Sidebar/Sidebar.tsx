@@ -13,7 +13,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className='bg-sidePrimarybg h-screen flex flex-col justify-between border-r border-stone-300' >
+      <div className='bg-sidePrimarybg h-full min-h-screen flex flex-col justify-between border-r border-stone-300' >
         <div className='flex flex-col p-4 gap-10'>
           <div>
             <h2 className='text-titleFont text-[1.5rem] font-semibold'>HRM Portal</h2>

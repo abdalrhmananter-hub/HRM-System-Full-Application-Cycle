@@ -1,7 +1,7 @@
 import React from 'react'
 import Sidebar from '../../Dashboard/Sidebar/Sidebar'
 import Navbar from '../../Dashboard/Navbar/Navbar'
-import EmpHome from '../../Dashboard/EmpHome/EmpHome'
+
 import { Outlet } from 'react-router-dom'
 
 export default function DashboardLayOut() {

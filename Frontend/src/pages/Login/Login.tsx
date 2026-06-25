@@ -10,15 +10,19 @@ import {userInfo} from '../../redux/userSlice';
 
 
 
+interface tokenPayload{
+      id:string;
+      userName:string;
+      role:string;
+      exp:number
+    }
 
 export default function Login() {
 
   let { register, handleSubmit, formState: { errors } } = useForm();
   const [showPass , setShowPass] = useState(false);
-  const navigate = useNavigate()
-
-  const count = useSelector((state: RootState) => state.counter.value)
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleshowPass = ()=>{
     setShowPass(!showPass);
@@ -26,18 +30,18 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     console.log(data);
-    const res = await axios.post('http://localhost:5000/employees/login', data)
+    const res = await axios.post('http://localhost:5000/employees/login', data,
+      {withCredentials:true}
+    )
     const token = res.data.token;
+    
+    localStorage.setItem('token',token)
     console.log(token)
-    interface tokenPayload{
-      id:string;
-      name:"string";
-      role:"string";
-      exp:number
-    }
+    
     const decode = jwtDecode<tokenPayload>(token);
+    console.log(decode)
     dispatch(userInfo(decode));
-    navigate("http://localhost:5000/users")
+    navigate("/users")
   }
   return (
     <div className={`${styles.bgColor} grid grid-cols-2 h-screen bg-no-repeat bg-cover bg-center `} style={{ backgroundImage: `url(${background})` }}>

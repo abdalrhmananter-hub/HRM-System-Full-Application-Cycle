@@ -9,7 +9,21 @@ dayjs.extend(timezone);
 const cairoTz = 'Africa/Cairo';
 
 //This is the another business logic for the attendace
-
+exports.getAllAttendanceForEmp = async (req,res,next)=>{
+    try {
+        const empId = req.userInfo.id;
+        const allAttendace = await Attendance.find({employee:empId});
+        if(allAttendace.length === 0)
+        {
+            const err = new Error('No Attendance sheet are available');
+            err.statusCode= 200;
+            return next(err)
+        }
+        return res.status(200).json({Message:"All Attendance",allAttendace});
+    } catch (error) {
+        
+    }
+}
 exports.checkIn = async(req,res,next)=>{
     try {
         const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
