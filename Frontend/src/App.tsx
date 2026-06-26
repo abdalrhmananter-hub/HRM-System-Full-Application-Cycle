@@ -12,6 +12,8 @@ import PayrollManagement from "./Components/Dashboard/AdminPayrollManagement/Pay
 import EmpPayrollDashboard from "./Components/Dashboard/EmpPayrollDashboard/EmpPayrollDashboard";
 import AdminLeaveManagement from "./Components/Dashboard/AdminLeaveManagement/AdminLeaveManagement";
 import EmpLeaveReq from "./Components/Dashboard/EmpLeaveReq/EmpLeaveReq";
+import AdminEmployeeDirectory from "./Components/Dashboard/AdminEmployeeDirectory/AdminEmployeeDirectory";
+import AdminDashboardOverview from "./Components/Dashboard/AdmindDashboardOverView/AdminDashboardOverview";
 
 
 function App() {
@@ -40,6 +42,8 @@ function App() {
         {path:"emppayrolldashboard" , element:<EmpPayrollDashboard/>},
         {path:"adminleavemanagement" , element:<AdminLeaveManagement/>},
         {path:"empleavereq" , element:<EmpLeaveReq/>},
+        {path:"employeedirectory" , element:<AdminEmployeeDirectory/>},
+        {path:"admindashboardoverview" , element:<AdminDashboardOverview/>},
 
       ]
     },
