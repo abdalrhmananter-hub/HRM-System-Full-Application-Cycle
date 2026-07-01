@@ -1,6 +1,5 @@
 //dotenv
-const dns = require("node:dns");
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 require('dotenv').config();
 //express and app
@@ -25,6 +24,7 @@ const payrollRouter = require('./routers/Payroll.routes');
 const conversationRouter = require('./routers/converstaions.routes');
 const messageRouter = require('./routers/message.routes');
 const notificationsRouter = require('./routers/notification.routes');
+const departmentsRouter = require('./routers/depratment.routes');
 //DB
 DB_connection();
 
@@ -59,6 +59,7 @@ app.use('/payroll',payrollRouter);
 app.use('./conversation',conversationRouter);
 app.use('/messages',messageRouter);
 app.use('/notifications', notificationsRouter);
+app.use('/department',departmentsRouter);
 
 
 

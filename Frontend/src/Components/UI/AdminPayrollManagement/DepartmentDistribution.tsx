@@ -3,7 +3,7 @@ import React from 'react'
 export default function DepartmentDistribution() {
     return (
         <>
-            <div className="w-full max-w-[320px] bg-white border border-gray-200 rounded-2xl p-5 shadow-sm font-sans flex flex-col gap-5">
+            <div className="w-full sm:max-w-[320px] bg-white border border-gray-200 rounded-2xl p-5 shadow-sm font-sans flex flex-col gap-5">
 
                 {/* Header Section */}
                 <div>

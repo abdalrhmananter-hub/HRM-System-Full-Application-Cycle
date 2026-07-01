@@ -9,11 +9,9 @@ export default function EmpPayslipDetials() {
                 <div className="flex justify-between items-center p-5">
                     <h2 className="text-[#1a202c] text-base font-bold">Employee Remuneration Details</h2>
                     <div className="flex items-center gap-3 text-[#718096]">
-                        {/* Filter Button */}
                         <button className="hover:bg-gray-100 p-2 rounded-lg transition-colors text-sm">
                             <i className="fa-solid fa-sliders"></i>
                         </button>
-                        {/* Sort Button */}
                         <button className="hover:bg-gray-100 p-2 rounded-lg transition-colors text-sm">
                             <i className="fa-solid fa-arrow-down-z-a"></i>
                         </button>
@@ -22,8 +20,7 @@ export default function EmpPayslipDetials() {
 
                 {/* Table Container */}
                 <div className="w-full overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[700px]">
-                        {/* Table Head */}
+                    <table className="w-full text-left border-collapse min-w-[600px]">
                         <thead>
                             <tr className="bg-[#f7fafc] border-y border-gray-200 text-[#718096] text-[11px] font-bold tracking-wider uppercase">
                                 <th className="py-3.5 px-5">Employee</th>
@@ -34,7 +31,6 @@ export default function EmpPayslipDetials() {
                             </tr>
                         </thead>
 
-                        {/* Table Body */}
                         <tbody className="divide-y divide-gray-100 text-sm font-medium text-[#4a5568]">
 
                             {/* Row 1: Jane Doe */}
@@ -118,10 +114,9 @@ export default function EmpPayslipDetials() {
                 </div>
 
                 {/* Footer Pagination Section */}
-                <div className="flex justify-between items-center p-4 bg-white border-t border-gray-100">
+                <div className="flex justify-between items-center p-4 bg-white border-t border-gray-100 text-xs sm:text-sm">
                     <span className="text-[#718096] text-xs">Showing 1-4 of 124 employees</span>
 
-                    {/* Numbers Pagination */}
                     <div className="flex items-center gap-1">
                         <button className="w-7 h-7 flex items-center justify-center border border-gray-200 rounded-lg text-xs text-gray-500 hover:bg-gray-50">
                             <i className="fa-solid fa-chevron-left text-[10px]"></i>

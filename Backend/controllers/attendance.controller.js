@@ -2,50 +2,87 @@ const Attendance = require('../models/Attendance');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const {sendNotification} = require('../utils/notification.service');
+const { sendNotification } = require('../utils/notification.service');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const cairoTz = 'Africa/Cairo';
 
 //This is the another business logic for the attendace
-exports.getAllAttendanceForEmp = async (req,res,next)=>{
+exports.getAllAttendanceForEmp = async (req, res, next) => {
     try {
         const empId = req.userInfo.id;
-        const allAttendace = await Attendance.find({employee:empId});
-        if(allAttendace.length === 0)
-        {
+        const allAttendace = await Attendance.find({ employee: empId });
+        if (allAttendace.length === 0) {
             const err = new Error('No Attendance sheet are available');
-            err.statusCode= 200;
+            err.statusCode = 200;
             return next(err)
         }
-        return res.status(200).json({Message:"All Attendance",allAttendace});
+        return res.status(200).json({ Message: "All Attendance", allAttendace });
     } catch (error) {
-        
+
     }
 }
-exports.checkIn = async(req,res,next)=>{
+
+exports.attendanceSheetsForAllEmpForToday = async (req, res, next) => {
+    try {
+        const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
+
+        const stats = await Attendance.aggregate([
+            {
+                $match: {
+                    date: todayDate
+                }
+            },
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            }
+
+        ]);
+        const formattedStats = {
+            present: 0,
+            absent: 0,
+            leave: 0,
+            pending: 0
+        };
+
+        stats.forEach(stat => {
+            if (formattedStats.hasOwnProperty(stat._id)) {
+                formattedStats[stat._id] = stat.count;
+            }
+        });
+
+        return res.status(200).json({
+            success:true,
+            message:"Today's Attendace Statistics",
+            data:formattedStats,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+exports.checkIn = async (req, res, next) => {
     try {
         const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
         const timeNow = dayjs().tz(cairoTz);
         const startOfShift = dayjs().tz(cairoTz).hour(9).minute(0).second(0).millisecond(0);
-        let delayInMinutes = 0 ;
+        let delayInMinutes = 0;
         const graceTime = 30;
         const empId = req.userInfo.id;
-        if(timeNow.isAfter(startOfShift))
-        {
-            delayInMinutes = timeNow.diff(startOfShift,'minute');
+        if (timeNow.isAfter(startOfShift)) {
+            delayInMinutes = timeNow.diff(startOfShift, 'minute');
         }
         //which logic is better? this => 
-        const attendanceSheet = await Attendance.findOne({employee:empId , date:todayDate});
-        if(!attendanceSheet)
-        {
+        const attendanceSheet = await Attendance.findOne({ employee: empId, date: todayDate });
+        if (!attendanceSheet) {
             const err = new Error('Something went wrong Please contact the HR');
             err.statusCode = 500;
             return next(err);
         }
-        if(attendanceSheet.checkIn != null)
-        {
+        if (attendanceSheet.checkIn != null) {
             const err = new Error('You are already checked in Thank you!');
             err.statusCode = 400;
             return next(err);
@@ -54,8 +91,7 @@ exports.checkIn = async(req,res,next)=>{
         attendanceSheet.lateMinutes = delayInMinutes;
         attendanceSheet.status = "present";
         await attendanceSheet.save();
-        if(delayInMinutes>=graceTime)
-        {
+        if (delayInMinutes >= graceTime) {
             await sendNotification(
                 req.app,
                 empId,
@@ -69,23 +105,22 @@ exports.checkIn = async(req,res,next)=>{
             {$set:{checkIn:timeNow.toDate(),lateMinutes:delayInMinutes}}
         );
         */
-        res.status(200).json({Message:"Check in successfully"})
+        res.status(200).json({ Message: "Check in successfully" })
     } catch (error) {
         next(error)
     }
 }
 
 
-exports.checkOut = async(req,res,next)=>{
+exports.checkOut = async (req, res, next) => {
     try {
         const todayDate = dayjs().tz(cairoTz).startOf('day').toDate();
         const timeNow = dayjs().tz(cairoTz);
 
-        const attendanceSheet = await Attendance.findOne({employee:req.userInfo.id,date:todayDate});
-        if(!attendanceSheet)
-        {
+        const attendanceSheet = await Attendance.findOne({ employee: req.userInfo.id, date: todayDate });
+        if (!attendanceSheet) {
             const err = new Error("something went wrong please check the HR");
-            err.statusCode= 500;
+            err.statusCode = 500;
             return next(err);
         }
 
@@ -94,9 +129,8 @@ exports.checkOut = async(req,res,next)=>{
             err.statusCode = 400;
             return next(err);
         }
-        
-        if(attendanceSheet.checkOut != null)
-        {
+
+        if (attendanceSheet.checkOut != null) {
             const err = new Error("You have already checked Out thank you");
             err.statusCode = 400;
             return next(err);
@@ -104,7 +138,7 @@ exports.checkOut = async(req,res,next)=>{
         attendanceSheet.checkOut = timeNow.toDate();
         await attendanceSheet.save()
 
-        res.status(200).json({Message:"check out successfully"});
+        res.status(200).json({ Message: "check out successfully" });
     } catch (error) {
         next(error);
     }

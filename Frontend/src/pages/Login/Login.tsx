@@ -3,46 +3,54 @@ import background from '../../assets/BackGround3.png'
 import styles from './Login.module.css'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
-import { useDispatch } from 'react-redux';
-import {userInfo} from '../../redux/userSlice';
 
 
+import { useSelector, useDispatch } from 'react-redux';
+import type { AppDispatch, RootState } from '../../redux/store';
+import { loginUser } from '../../redux/authSlice';
 
-interface tokenPayload{
-      id:string;
-      userName:string;
-      role:string;
-      exp:number
-    }
+interface ILoginInputs {
+  email: string;
+  password?: string;
+}
+
+
 
 export default function Login() {
 
-  let { register, handleSubmit, formState: { errors } } = useForm();
-  const [showPass , setShowPass] = useState(false);
+  let { register, handleSubmit, formState: { errors } } = useForm<ILoginInputs>();
+  const [showPass, setShowPass] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleshowPass = ()=>{
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleshowPass = () => {
     setShowPass(!showPass);
-  }
+  };
 
-  const onSubmit = async (data) => {
-    console.log(data);
-    const res = await axios.post('http://localhost:5000/employees/login', data,
-      {withCredentials:true}
-    )
-    const token = res.data.token;
-    
-    localStorage.setItem('token',token)
-    console.log(token)
-    
-    const decode = jwtDecode<tokenPayload>(token);
-    console.log(decode)
-    dispatch(userInfo(decode));
-    navigate("/users")
-  }
+  const onSubmit = async (data: ILoginInputs) => {
+
+    // نقوم بعمل dispatch للـ thunk ونمرر له الـ email والـ password
+    const resultAction = await dispatch(loginUser({ email: data.email, password: data.password || '' }));
+
+    console.log(resultAction);
+    // التحقق من أن عملية تسجيل الدخول تمت بنجاح في قاعدة البيانات
+    if (loginUser.fulfilled.match(resultAction)) {
+      const user = resultAction.payload;
+      console.log("The User from user login",user)
+      if (user && user.role) {
+        const userRole = user.role.toLowerCase();
+        if (userRole === 'hr_admin') {
+          navigate("/admin"); // تحويله إلى لوحة تحكم الأدمن ومساراتها الفرعية
+        } else if (userRole === 'employee') {
+          navigate("/employee"); // تحويله إلى لوحة تحكم الموظف ومساراتها الفرعية
+        } else {
+          // مسار احتياطي في حال وجود أدوار أخرى مستقبلاً
+          navigate("/");
+        }
+      }
+    }
+  };
   return (
     <div className={`${styles.bgColor} grid grid-cols-2 h-screen bg-no-repeat bg-cover bg-center `} style={{ backgroundImage: `url(${background})` }}>
       <div className={` flex justify-center items-center  `}>
@@ -61,14 +69,14 @@ export default function Login() {
               </div>
               {errors.email && <span className={`text-red-600`}>{errors.email.message}</span>}
             </div>
-              {/* password Part */}
+            {/* password Part */}
             <div>
               <div className='flex items-center gap-4 grow border border-white/50 bg-white/20 rounded-md p-3 mb-2'>
                 <i className="fa-solid fa-lock text-stone-600"></i>
                 <input className='grow focus:outline-none' type={showPass ? "text" : "password"} placeholder='Password' {...register("password", { required: "This feild is required", minLength: { value: 6, message: "Min length is 6" } })} />
                 <button type='button' className='cursor-pointer' onClick={handleshowPass}>
                   {showPass ? <i className="fa-solid fa-eye"></i> : <i className="fa-solid fa-eye-slash text-stone-600"></i>}
-                  </button>
+                </button>
 
               </div>
               {errors.password && <span className='text-red-500 mb-6'>{errors.password.message}</span>}

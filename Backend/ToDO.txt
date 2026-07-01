@@ -1,5 +1,5 @@
 1-Seed file
-2- check the remaining function in payroll control
+2- check the remaining function in payroll control // updated but still need to be checked 
 3- socite io >>>>Done
 4- find a eaiser way to handle error functions
 5- Apply all the secuirty vurnerability

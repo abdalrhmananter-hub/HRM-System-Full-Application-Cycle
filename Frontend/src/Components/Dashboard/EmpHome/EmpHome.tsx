@@ -1,73 +1,72 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import CardStatus from '../../UI/EmpHomeCards/CardStatus'
-import { useSelector } from 'react-redux'
-import { type RootState } from '../../../redux/store'
-import UpdateCard from '../../UI/EmpHomeCards/UpdateCard';
-import MyAttendace from '../../UI/EmpHomeCards/MyAttendace';
-import RecentPaySlip from '../../UI/EmpHomeCards/RecentPaySlip';
-import { NavLink } from 'react-router-dom';
-
-
+import UpdateCard from '../../UI/EmpHomeCards/UpdateCard'
+import MyAttendace from '../../UI/EmpHomeCards/MyAttendace'
+import RecentPaySlip from '../../UI/EmpHomeCards/RecentPaySlip'
+import { NavLink } from 'react-router-dom'
 
 export default function EmpHome() {
-
-  //handle the name the time
-  const userDetails = useSelector((state: RootState) => state.user.value) as any;
-  const date = new Date().toLocaleDateString('en-UE', {
+  // handle the name the time
+  const date = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
-  //handle the cards status cards icons.
-  //You need to fetch the data from the back end and add it
-  // api call to get the ifno
+
+  // handle the cards status cards icons
   const cardStatusDetials = [
     { icon: "fa-solid fa-plane-departure", title: "Annual Leave", info: 14.5 },
     { icon: "fa-solid fa-suitcase-medical", title: "Sick Leave", info: 8 },
     { icon: "fa-solid fa-star-of-life", title: "Emergency", info: 3 }
   ]
 
-  // you need to get the data from the back end and use condition if exists add a field.
-  //api call
-  //set use state to collect the approved requests,the updatedCard is handled
+  // State / API placeholders
   const leaveRequests = [];
-  //set a use state to collect new pay slips, the updateCard is handled
-  //call api
   const newPayRoll = null;
-  //Call api and a set useState to handle this point.
   const myAttendace = [];
-  //call api set a useState to handle this point
   const myPaySlips = [];
+
   return (
-    <div className='flex flex-col gap-4 ms-4'>
-      <div className='flex justify-between items-center me-3'>
-        <div >
-          <h1 className='text-stone-900 font-bold'>Welcome back, {userDetails?.userName}</h1>
-          <p className='text-stone-500'>Today is {date}</p>
+    <div className='flex flex-col gap-6 p-4 w-full max-w-full overflow-hidden'>
+      {/* Top Header Section */}
+      <div className='flex justify-between items-center w-full pr-3'>
+        <div>
+          <h1 className='text-stone-900 text-2xl font-bold tracking-tight'>Welcome back</h1>
+          <p className='text-stone-500 text-sm'>Today is {date}</p>
         </div>
         <div>
-        <NavLink to={""} className='text-white bg-blue-600 rounded p-1 pe-2 hover:bg-blue-800 cursor-pointer'>
-          + Submit leave request</NavLink>
+          <NavLink to={""} className='text-white bg-blue-600 rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm cursor-pointer inline-block'>
+            + Submit leave request
+          </NavLink>
         </div>
       </div>
-      <div className='flex gap-5'>
-        <div className='flex gap-5'>
-          {
-            cardStatusDetials.map((card, index) => (
-              <CardStatus key={index} icon={card.icon} title={card.title}
-                info={card.info} />
-            ))
-          }
+
+      {/* Middle Section: Cards Status & Updates */}
+      <div className='flex flex-col xl:flex-row gap-6 items-start w-full'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full xl:w-auto shrink-0'>
+          {cardStatusDetials.map((card, index) => (
+            <CardStatus 
+              key={index} 
+              icon={card.icon} 
+              title={card.title}
+              info={card.info} 
+            />
+          ))}
         </div>
-        <div>
+        <div className='w-full xl:w-[340px] shrink-0'>
           <UpdateCard leaveRequests={leaveRequests} newPayroll={newPayRoll} />
         </div>
-
       </div>
-      <div className=" flex gap-5">
-        <MyAttendace myAttendance={myAttendace} />
-        <RecentPaySlip myPaySlips={myPaySlips} />
+
+      {/* Bottom Section: Attendance & Payslips */}
+      <div className="flex flex-col xl:flex-row gap-6 items-start w-full">
+        <div className='w-full xl:flex-1 min-w-0'>
+          <MyAttendace myAttendace={myAttendace} />
+        </div>
+        <div className='w-full xl:w-[340px] shrink-0'>
+          <RecentPaySlip myPaySlips={myPaySlips} />
+        </div>
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-const { checkIn , checkOut , getAllAttendanceForEmp} = require('../controllers/attendance.controller');
+const { checkIn , checkOut , getAllAttendanceForEmp , attendanceSheetsForAllEmpForToday} = require('../controllers/attendance.controller');
 
 const attendaceSchema = require("../validations/attendance.validation");
 
@@ -12,5 +12,6 @@ router.use(verifyToken);
 router.post("/checkin",checkIn);
 router.post("/checkout",checkOut);
 router.get("/getAllAttendance",getAllAttendanceForEmp);
+router.get('/getAllAttendanceforAllempToday',attendanceSheetsForAllEmpForToday)
 
 module.exports = router;

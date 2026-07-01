@@ -10,7 +10,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 exports.getAllPenddingLeaveRequests = async (req, res, next) => {
     try {
-        const allRequests = await LeaveRequest.find({ status: "pending" });
+        const allRequests = await LeaveRequest.find({ status: "pending" }).populate("employee", "fullName profilePicture jobRole");
         res.status(200).json({ Message: "All Requests: ", allRequests });
     } catch (error) {
         next(error)
@@ -109,11 +109,13 @@ exports.apporveLeaveRequest = async (req, res, next) => {
         leaveRequest.reviewedAt = dayjs().tz(cairoTz).toDate();
         await leaveRequest.save();
         await emp.save();
+
+        const formattedDate = dayjs(leaveRequest.startDate).format('YYYY-MM-DD');
         await sendNotification(
             req.app,
             leaveRequest.employee,
             'leave_approved',
-            `The leave request was approved, which was submitted on ${leaveRequest.startDate.toLocaleDateString()}`
+            `The leave request was approved, which was submitted on ${formattedDate}`
         )
         if(emp.annualLeaveBal<=3)
         {
@@ -151,11 +153,12 @@ exports.rejectLeaveRequest = async(req,res,next)=>{
         leaveRequest.reviewedAt = dayjs().tz(cairoTz).toDate();
 
         await leaveRequest.save();
+        const formattedDate = dayjs(leaveRequest.startDate).format('YYYY-MM-DD');
         await sendNotification(
             req.app,
             leaveRequest.employee,
             'leave_rejected',
-            `The leave request was rejected, which was submitted on ${leaveRequest.startDate.toLocaleDateString()}`
+            `The leave request was rejected, which was submitted on ${formattedDate}`
         )
         return res.status(200).json({Message:"The request has been rejected."});
     } catch (error) {

@@ -1,6 +1,22 @@
 import React from 'react'
 
-export default function AdminPendingReqLeaves() {
+export default function AdminPendingReqLeaves({ requests = [] }) {
+    // مصفوفة لتحديد الألوان المناسبة لكل حالة تلقائيًا
+    const statusStyles = {
+        Pending: {
+            badge: "bg-[#fffaf0] text-[#dd6b20]",
+            border: "border-[#1e56a0]"
+        },
+        Approved: {
+            badge: "bg-[#e6fffa] text-[#319795]",
+            border: "border-[#319795]"
+        },
+        Rejected: {
+            badge: "bg-[#fff5f5] text-[#e53e3e]",
+            border: "border-[#e53e3e]"
+        }
+    };
+
     return (
         <>
             <div className="w-full max-w-[800px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm font-sans">
@@ -14,65 +30,45 @@ export default function AdminPendingReqLeaves() {
 
                     {/* Badge for total requests */}
                     <span className="bg-blue-50 text-[#1e56a0] text-xs font-bold px-2.5 py-1 rounded-full">
-                        03 Total
+                        {String(requests.length).padStart(2, '0')} Total
                     </span>
                 </div>
 
                 {/* Requests List */}
                 <div className="divide-y divide-gray-100">
+                    {requests.length === 0 ? (
+                        <div className="p-8 text-center text-sm text-gray-400">
+                            No leave requests found.
+                        </div>
+                    ) : (
+                        requests.map((req, index) => {
+                            // جلب ستايل الحالة الحالية أو استخدام الـ Pending كحالة افتراضية
+                            const style = statusStyles[req.status] || statusStyles.Pending;
 
-                    {/* Request 1: Pending */}
-                    <div className="p-5 flex flex-col gap-3 hover:bg-gray-50/50 transition-colors">
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[#1a202c] font-bold text-sm">Annual Leave</span>
-                                <span className="text-[#a0aec0] text-xs font-medium">Oct 24 - Oct 28 • 5 Days Total</span>
-                            </div>
-                            {/* Status Badge */}
-                            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-md bg-[#fffaf0] text-[#dd6b20]">
-                                Pending
-                            </span>
-                        </div>
-                        {/* Employee Reason Note */}
-                        <div className="bg-[#f7fafc] border-l-2 border-[#1e56a0] p-3 rounded-r-xl text-xs font-medium text-[#4a5568] leading-relaxed">
-                            "Family vacation planned since July. Handover documents already uploaded to Jira."
-                        </div>
-                    </div>
-
-                    {/* Request 2: Approved */}
-                    <div className="p-5 flex flex-col gap-3 hover:bg-gray-50/50 transition-colors">
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[#1a202c] font-bold text-sm">Sick Leave</span>
-                                <span className="text-[#a0aec0] text-xs font-medium">Oct 19 - Oct 20 • 2 Days Total</span>
-                            </div>
-                            {/* Status Badge */}
-                            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-md bg-[#e6fffa] text-[#319795]">
-                                Approved
-                            </span>
-                        </div>
-                        <div className="bg-[#f7fafc] border-l-2 border-[#319795] p-3 rounded-r-xl text-xs font-medium text-[#4a5568] leading-relaxed">
-                            "Sudden flu. Medical certificate will be provided upon return."
-                        </div>
-                    </div>
-
-                    {/* Request 3: Rejected */}
-                    <div className="p-5 flex flex-col gap-3 hover:bg-gray-50/50 transition-colors">
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[#1a202c] font-bold text-sm">Casual Leave</span>
-                                <span className="text-[#a0aec0] text-xs font-medium">Sep 12 • 1 Day Total</span>
-                            </div>
-                            {/* Status Badge */}
-                            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-md bg-[#fff5f5] text-[#e53e3e]">
-                                Rejected
-                            </span>
-                        </div>
-                        <div className="bg-[#f7fafc] border-l-2 border-[#e53e3e] p-3 rounded-r-xl text-xs font-medium text-[#4a5568] leading-relaxed">
-                            "Urgent personal matter at the embassy."
-                        </div>
-                    </div>
-
+                            return (
+                                <div key={req.id || index} className="p-5 flex flex-col gap-3 hover:bg-gray-50/50 transition-colors">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="text-[#1a202c] font-bold text-sm">{req.type}</span>
+                                            <span className="text-[#a0aec0] text-xs font-medium">
+                                                {req.startDate} - {req.endDate} • {req.duration} Days Total
+                                            </span>
+                                        </div>
+                                        {/* Status Badge */}
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-md ${style.badge}`}>
+                                            {req.status}
+                                        </span>
+                                    </div>
+                                    {/* Employee Reason Note */}
+                                    {req.reason && (
+                                        <div className={`bg-[#f7fafc] border-l-2 ${style.border} p-3 rounded-r-xl text-xs font-medium text-[#4a5568] leading-relaxed`}>
+                                            "{req.reason}"
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
 
                 {/* Footer Button */}
